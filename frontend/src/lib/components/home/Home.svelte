@@ -19,6 +19,7 @@
   import { clamp } from "$lib/mathutil";
   import { now } from "$lib/reactiveNow.svelte";
   import type { DurationFormatOptions } from "../../../app";
+  import { onMount } from "svelte";
 
   let {
     dayState,
@@ -142,6 +143,7 @@
 
   const sessionStarter =
     (avenue: string, duration: Temporal.Duration) => () => {
+      hoveredItem = null;
       onSessionStart(
         avenue,
         now(),
@@ -155,6 +157,16 @@
   };
 
   const modeTitle = $derived(decrypt(dayState.modeTitle));
+
+  onMount(() => {
+    const blur = () => {
+      hoveredItem = null;
+    };
+    window.addEventListener("blur", blur);
+    return () => {
+      window.removeEventListener("blur", blur);
+    };
+  });
 </script>
 
 <div class="w-full h-full p-4">
