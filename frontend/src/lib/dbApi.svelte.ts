@@ -34,7 +34,6 @@ import { now } from "./reactiveNow.svelte";
 const defaultDayState: DayState = {
   start: 0,
   end: null,
-  isDetox: false,
   stepAway: {},
   modeTitle: encryptEmpty(),
   avenues: {},
@@ -252,7 +251,6 @@ export const db = await (async () => {
           end: null,
           modeTitle: modeConfig.title,
           modeDescription: modeConfig.description,
-          isDetox: false,
           stepAway: {},
           avenues: Object.fromEntries([
             ...Object.entries(config.baseAvenues).map(([id, info]) => [
@@ -272,7 +270,6 @@ export const db = await (async () => {
           end: null,
           modeTitle: encrypt("Detox"),
           modeDescription: encrypt("Log off and relax."),
-          isDetox: true,
           stepAway: {},
           avenues: Object.fromEntries(
             Object.entries(config.baseAvenues).map(([id, info]) => [

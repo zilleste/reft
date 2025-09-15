@@ -196,7 +196,7 @@
                 }}>End day</FrictionButton
               >
             {/if}
-            {#if dayState.end && !dayState.isDetox && !isInStepAway(dayState)}
+            {#if dayState.end && !isInStepAway(dayState)}
               <FrictionButton
                 friction={1000}
                 onactivate={() => {

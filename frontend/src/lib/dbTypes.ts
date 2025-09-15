@@ -36,7 +36,6 @@ export type App = z.infer<typeof App>;
 export const DayState = z.object({
   start: z.number(),
   end: z.number().nullable(),
-  isDetox: z.boolean(),
   stepAway: z.record(z.string(), BoundedSession),
   modeTitle: EncryptedString,
   modeDescription: EncryptedString,

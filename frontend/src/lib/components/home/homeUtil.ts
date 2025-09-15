@@ -7,19 +7,6 @@ export function isInStepAway(day: DayState): boolean {
   return currentSession(Object.values(day.stepAway)) !== null;
 }
 
-export function detoxRestrictionsApply(day: DayState): boolean {
-  if (isInStepAway(day)) {
-    return true;
-  }
-  if (day.isDetox) {
-    return true;
-  }
-  if (day.end) {
-    return true;
-  }
-  return false;
-}
-
 export function areAvenuesAvailable(day: DayState): boolean {
   return !day.end && !isInStepAway(day);
 }

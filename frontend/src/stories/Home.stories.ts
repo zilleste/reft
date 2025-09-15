@@ -35,7 +35,6 @@ const avenue = (title: string, desc: string, budgetMinutes: number) => ({
 const baseDay = (overrides: Partial<DayState> = {}): DayState => ({
   start: minutesAgo(600),
   end: null,
-  isDetox: false,
   stepAway: {},
   modeTitle: encrypt("Productive"),
   modeDescription: encrypt(
@@ -76,7 +75,6 @@ type Story = StoryObj<typeof meta>;
 export const NormalSession: Story = {
   args: {
     dayState: baseDay({
-      isDetox: false,
       bypasses: pastBypasses("normal"),
     }),
   },
@@ -85,7 +83,6 @@ export const NormalSession: Story = {
 export const DetoxSession: Story = {
   args: {
     dayState: baseDay({
-      isDetox: true,
       modeTitle: encrypt("Detox"),
       bypasses: pastBypasses("detox"),
     }),
