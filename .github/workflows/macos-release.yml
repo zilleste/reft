@@ -68,6 +68,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check frontend
+        working-directory: frontend
+        run: pnpx sv check
+
       - name: Build frontend (SvelteKit)
         run: pnpm --filter=frontend build
 
