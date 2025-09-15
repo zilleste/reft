@@ -14,9 +14,7 @@ export const BoundedSession = UnboundedSession.extend({
 });
 export type BoundedSession = z.infer<typeof BoundedSession>;
 
-export const BypassSession = BoundedSession.extend({
-  mode: z.enum(["normal", "detox"]),
-});
+export const BypassSession = BoundedSession.extend({});
 export type BypassSession = z.infer<typeof BypassSession>;
 
 export const AvenueInfo = z.object({
@@ -36,7 +34,6 @@ export type App = z.infer<typeof App>;
 export const DayState = z.object({
   start: z.number(),
   end: z.number().nullable(),
-  isDetox: z.boolean(),
   stepAway: z.record(z.string(), BoundedSession),
   modeTitle: EncryptedString,
   modeDescription: EncryptedString,

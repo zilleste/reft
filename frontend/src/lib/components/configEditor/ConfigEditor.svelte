@@ -15,16 +15,11 @@
     goBack,
   }: {
     config: PermanentState;
-    startDay?: (
-      selectedMode: { type: "detox" } | { type: "custom"; mode: string }
-    ) => void;
+    startDay?: (selectedMode: string) => void;
     goBack?: () => void;
   } = $props();
 
   type MenuItem =
-    | {
-        type: "detox";
-      }
     | {
         type: "custom_mode";
         mode: [string, CustomMode];
@@ -56,19 +51,16 @@
     >
       <div
         class={`w-96 h-full border-r-2 border-amber-300 flex flex-col overflow-y-scroll ${
-          selectedItem?.type === "detox" ? "border-t-[4px]" : "pt-[4px]"
+          selectedItem?.type === "custom_mode" &&
+          selectedItem.mode[0] === customModes[0]?.[0]
+            ? "border-t-[4px]"
+            : "pt-[4px]"
         } ${
           selectedItem?.type === "allowed_packages" && !goBack
             ? "border-b-[4px]"
             : "pb-[4px]"
         }`}
       >
-        <ConfigEditorItem
-          isSelected={selectedItem?.type === "detox"}
-          onClick={() => (selectedItem = { type: "detox" })}
-        >
-          Detox
-        </ConfigEditorItem>
         {#each customModes as [key, mode], i (key)}
           {@const isSelected =
             selectedItem?.type === "custom_mode" &&
@@ -163,20 +155,13 @@
           }}><i>+ Add custom mode</i></ConfigEditorItem
         >
         <div class="flex-grow"></div>
-        {#if startDay && (selectedItem?.type === "detox" || selectedItem?.type === "custom_mode")}
+        {#if startDay && selectedItem?.type === "custom_mode"}
           <div class="p-4">
             <FrictionButton
               friction={5000}
               onactivate={() => {
                 if (selectedItem?.type === "custom_mode") {
-                  startDay?.({
-                    type: "custom",
-                    mode: selectedItem.mode[0],
-                  });
-                } else {
-                  startDay?.({
-                    type: "detox",
-                  });
+                  startDay?.(selectedItem.mode[0]);
                 }
               }}>Start new day</FrictionButton
             >
@@ -195,9 +180,6 @@
         {/if}
       </div>
 
-      {#if selectedItem?.type === "detox"}
-        <ConfigEditorMode bind:baseAvenues={config.baseAvenues} />
-      {/if}
       {#if selectedItem?.type === "custom_mode"}
         <ConfigEditorMode
           bind:baseAvenues={config.baseAvenues}

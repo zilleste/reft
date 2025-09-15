@@ -7,19 +7,6 @@ export function isInStepAway(day: DayState): boolean {
   return currentSession(Object.values(day.stepAway)) !== null;
 }
 
-export function detoxRestrictionsApply(day: DayState): boolean {
-  if (isInStepAway(day)) {
-    return true;
-  }
-  if (day.isDetox) {
-    return true;
-  }
-  if (day.end) {
-    return true;
-  }
-  return false;
-}
-
 export function areAvenuesAvailable(day: DayState): boolean {
   return !day.end && !isInStepAway(day);
 }
@@ -28,25 +15,14 @@ export function bypassFrictionPerMinute(
   day: DayState,
   bypasses: BypassSession[]
 ): number {
-  const nonDetoxBypassTimeMins = totalTime(
-    bypasses.filter((s) => s.mode === "normal")
-  ).total("minutes");
-  const detoxBypassTimeMins = totalTime(
-    bypasses.filter((s) => s.mode === "detox")
-  ).total("minutes");
-  const totalBypassTimeMins = nonDetoxBypassTimeMins + detoxBypassTimeMins;
-  if (detoxRestrictionsApply(day)) {
-    return (
-      400 *
-      (1 +
-        nonDetoxBypassTimeMins / 5 +
-        detoxBypassTimeMins / 3 +
-        Math.pow(detoxBypassTimeMins / 10, 2) +
-        Math.pow(detoxBypassTimeMins / 30, 3))
-    );
-  } else {
-    return 200 * (1 + totalBypassTimeMins / 5);
-  }
+  const bypassTimeMins = totalTime(bypasses).total("minutes");
+  return (
+    400 *
+    (1 +
+      bypassTimeMins / 3 +
+      Math.pow(bypassTimeMins / 10, 2) +
+      Math.pow(bypassTimeMins / 30, 3))
+  );
 }
 
 export function nextDayReady(day: DayState): boolean {
