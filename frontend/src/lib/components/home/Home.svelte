@@ -166,7 +166,7 @@
 
     <!-- Top-right: align bottom-left (towards center) -->
     <div
-      class="place-self-stretch justify-self-stretch mb-[-0.77em] relative grow group select-none cursor-pointer"
+      class="place-self-stretch justify-self-stretch mb-[-0.77em] relative grow group select-none"
     >
       <div class="flex flex-row items-end h-full w-full">
         <span class="text-8xl font-black font-display group-hover:invisible"
