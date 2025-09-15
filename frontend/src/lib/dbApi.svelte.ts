@@ -33,7 +33,7 @@ import { now } from "./reactiveNow.svelte";
 
 const defaultDayState: DayState = {
   start: 0,
-  end: null,
+  end: 1,
   stepAway: {},
   modeTitle: encryptEmpty(),
   avenues: {},

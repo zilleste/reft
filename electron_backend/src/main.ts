@@ -45,6 +45,7 @@ function createWindow() {
       backgroundThrottling: false,
     },
     frame: false,
+    roundedCorners: false,
   });
 
   if (isDev) {

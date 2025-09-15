@@ -8,6 +8,7 @@
   import { ArrowLeft, Trash } from "@lucide/svelte";
   import ConfigEditorMode from "./ConfigEditorMode.svelte";
   import FrictionButton from "../FrictionButton.svelte";
+  import { onMount } from "svelte";
 
   let {
     config = $bindable(),
@@ -38,13 +39,23 @@
   let selectedItem = $state<MenuItem | null>(null);
 
   let hoveredCustomMode = $state<[string, "top" | "bottom"] | null>(null);
+
+  onMount(() => {
+    const escapeHandler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        goBack?.();
+      }
+    };
+    window.addEventListener("keydown", escapeHandler);
+    return () => window.removeEventListener("keydown", escapeHandler);
+  });
 </script>
 
 <svelte:boundary
   onerror={(e, reset) => (console.error(e), setTimeout(reset, 1000))}
 >
   <div
-    class="w-full h-full overflow-hidden flex flex-col justify-stretch items-stretch"
+    class="w-full h-full overflow-hidden flex flex-col justify-stretch items-stretch pt-8"
   >
     <div
       class="flex flex-row border-2 border-amber-300 m-4 grow rounded-2xl overflow-hidden"
@@ -152,7 +163,7 @@
               type: "custom_mode",
               mode: [key, config.customModes[key]],
             };
-          }}><i>+ Add custom mode</i></ConfigEditorItem
+          }}><i>+ Add mode</i></ConfigEditorItem
         >
         <div class="flex-grow"></div>
         {#if startDay && selectedItem?.type === "custom_mode"}
