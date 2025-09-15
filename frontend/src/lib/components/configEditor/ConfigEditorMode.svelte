@@ -194,6 +194,13 @@
       }
     }
   }
+
+  const selectedItemExists = $derived(
+    (selectedItem?.type === "base_avenue" &&
+      baseAvenues[selectedItem.avenue]) ||
+      (selectedItem?.type === "custom_avenue" &&
+        customMode!.avenues[selectedItem.avenue])
+  );
 </script>
 
 <div
@@ -375,7 +382,7 @@
   onerror={(e, reset) => (console.error(e), setTimeout(reset, 1000))}
 >
   <div class="h-full grow p-4 flex flex-col justify-stretch items-stretch">
-    {#if selectedItem?.type === "custom_avenue" || selectedItem?.type === "base_avenue"}
+    {#if selectedItemExists}
       {@const avenue =
         selectedItem.type === "custom_avenue"
           ? customMode!.avenues[selectedItem.avenue]
