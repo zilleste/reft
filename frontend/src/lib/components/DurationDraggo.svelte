@@ -25,10 +25,6 @@
     return Temporal.Duration.compare(d, ZERO) === 0;
   }
 
-  function total(unit: "minutes" | "hours" | "days", d: Temporal.Duration) {
-    return d.total({ unit });
-  }
-
   function roundedDisplay(d: Temporal.Duration): { text: string } {
     if (isZero(d)) {
       const z = zeroText ?? "0m";
