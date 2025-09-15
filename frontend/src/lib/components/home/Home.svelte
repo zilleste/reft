@@ -165,57 +165,59 @@
     </div>
 
     <!-- Top-right: align bottom-left (towards center) -->
-    <div class="place-self-end justify-self-start mb-[-0.77em] relative">
-      <div class="select-none cursor-pointer group">
-        <span class="text-8xl font-black font-display"
+    <div
+      class="place-self-stretch justify-self-stretch mb-[-0.77em] relative grow group select-none cursor-pointer"
+    >
+      <div class="flex flex-row items-end h-full w-full">
+        <span class="text-8xl font-black font-display group-hover:invisible"
           >{hoveredItem?.type === "avenue"
             ? decrypt(dayState.avenues[hoveredItem.avenue].info.title)
             : dayState.end
               ? "The End"
               : decrypt(dayState.modeTitle)}</span
         >
+      </div>
 
-        <div
-          class="absolute bottom-0 left-0 group-hover:opacity-100 opacity-0 bg-black flex flex-col justify-end w-full h-full"
-        >
-          <div class="flex flex-row gap-2 pb-3">
-            {#if !dayState.end}
-              <FrictionButton
-                friction={1000}
-                onactivate={() => {
-                  onDayEnd();
-                }}>End day</FrictionButton
-              >
-            {/if}
-            {#if dayState.end && !isInStepAway(dayState)}
-              <FrictionButton
-                friction={1000}
-                onactivate={() => {
-                  onDayEndUndo();
-                }}>Undo end day</FrictionButton
-              >
-            {/if}
+      <div
+        class="absolute bottom-0 left-0 right-0 top-0 group-hover:visible invisible flex flex-col justify-end w-full h-full"
+      >
+        <div class="flex flex-row gap-2 pb-3">
+          {#if !dayState.end}
             <FrictionButton
-              friction={500}
+              friction={1000}
               onactivate={() => {
-                onConfig();
-              }}
+                onDayEnd();
+              }}>End day</FrictionButton
             >
-              {#if nextDayReady(dayState)}
-                Start next day
-              {:else}
-                Edit config
-              {/if}
-            </FrictionButton>
+          {/if}
+          {#if dayState.end && !isInStepAway(dayState)}
             <FrictionButton
-              friction={2000}
+              friction={1000}
               onactivate={() => {
-                onShutdown();
-              }}
+                onDayEndUndo();
+              }}>Undo end day</FrictionButton
             >
-              Shut down
-            </FrictionButton>
-          </div>
+          {/if}
+          <FrictionButton
+            friction={500}
+            onactivate={() => {
+              onConfig();
+            }}
+          >
+            {#if nextDayReady(dayState)}
+              Start next day
+            {:else}
+              Edit config
+            {/if}
+          </FrictionButton>
+          <FrictionButton
+            friction={2000}
+            onactivate={() => {
+              onShutdown();
+            }}
+          >
+            Shut down
+          </FrictionButton>
         </div>
       </div>
     </div>
