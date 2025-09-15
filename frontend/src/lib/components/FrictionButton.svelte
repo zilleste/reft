@@ -2,10 +2,11 @@
   import type { Snippet } from "svelte";
   import Checkmark from "@lucide/svelte/icons/check";
   import { Spring } from "svelte/motion";
+  import { dev } from "$app/environment";
 
   // Props: children + { friction: number }
   let {
-    friction = 1000,
+    friction: _friction = 1000,
     children,
     onactivate,
   }: {
@@ -13,6 +14,8 @@
     children?: Snippet;
     onactivate?: () => void;
   } = $props();
+
+  const friction = $derived(dev ? 100 : _friction);
 
   // interaction state
   let isPressing = $state(false);

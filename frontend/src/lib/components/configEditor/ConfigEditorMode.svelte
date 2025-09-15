@@ -194,6 +194,13 @@
       }
     }
   }
+
+  const selectedItemExists = $derived(
+    (selectedItem?.type === "base_avenue" &&
+      baseAvenues[selectedItem.avenue]) ||
+      (selectedItem?.type === "custom_avenue" &&
+        customMode!.avenues[selectedItem.avenue])
+  );
 </script>
 
 <div
@@ -332,15 +339,11 @@
             bind:duration={
               () =>
                 Temporal.Duration.from({
-                  nanoseconds: Math.round(
+                  seconds: Math.round(
                     (isBase
                       ? baseAvenues[avenueItem.avenue]
                       : customMode!.avenues[avenueItem.avenue]
-                    ).budgetMinutes *
-                      60 *
-                      1000 *
-                      1000 *
-                      1000
+                    ).budgetMinutes * 60
                   ),
                 }),
               (v: Temporal.Duration) => {
@@ -375,7 +378,7 @@
   onerror={(e, reset) => (console.error(e), setTimeout(reset, 1000))}
 >
   <div class="h-full grow p-4 flex flex-col justify-stretch items-stretch">
-    {#if selectedItem?.type === "custom_avenue" || selectedItem?.type === "base_avenue"}
+    {#if (selectedItemExists && selectedItem?.type === "custom_avenue") || selectedItem?.type === "base_avenue"}
       {@const avenue =
         selectedItem.type === "custom_avenue"
           ? customMode!.avenues[selectedItem.avenue]

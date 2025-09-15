@@ -11,8 +11,8 @@
     onStepAway: (start: Temporal.Instant, end: Temporal.Instant) => void;
   } = $props();
 
-  let length = $state(Temporal.Duration.from({ minutes: 60 }));
-  let offset = $state(Temporal.Duration.from({ minutes: 0 }));
+  let length = $state(Temporal.Duration.from({ seconds: 60 * 60 }));
+  let offset = $state(Temporal.Duration.from({ seconds: 0 }));
 </script>
 
 <div class="flex flex-col w-42">
@@ -23,11 +23,11 @@
         (v) =>
           (length = clamp(
             v,
-            Temporal.Duration.from({ minutes: 0 }),
-            Temporal.Duration.from({ days: 1 })
+            Temporal.Duration.from({ seconds: 0 }),
+            Temporal.Duration.from({ seconds: 60 * 60 * 24 })
           ))
       }
-      default={Temporal.Duration.from({ minutes: 60 })}
+      default={Temporal.Duration.from({ seconds: 60 * 60 })}
       allowNegative={false}
     />
     <DurationDraggo
@@ -36,8 +36,8 @@
         (v) =>
           (offset = clamp(
             v,
-            Temporal.Duration.from({ minutes: 0 }),
-            Temporal.Duration.from({ hours: 6 })
+            Temporal.Duration.from({ seconds: 0 }),
+            Temporal.Duration.from({ seconds: 60 * 60 * 6 })
           ))
       }
       prefix="in "

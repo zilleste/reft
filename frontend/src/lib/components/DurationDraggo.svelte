@@ -17,16 +17,52 @@
     allowNegative?: boolean;
   } = $props();
 
+  if (
+    duration.milliseconds !== 0 ||
+    duration.microseconds !== 0 ||
+    duration.nanoseconds !== 0 ||
+    duration.minutes !== 0 ||
+    duration.hours !== 0 ||
+    duration.days !== 0 ||
+    duration.weeks !== 0 ||
+    duration.months !== 0 ||
+    duration.years !== 0
+  ) {
+    console.error(
+      "DurationDraggo duration may not contain units other than seconds!",
+      duration
+    );
+    throw new Error(
+      "DurationDraggo duration may not contain units other than seconds!"
+    );
+  }
+
+  if (
+    defaultDuration.milliseconds !== 0 ||
+    defaultDuration.microseconds !== 0 ||
+    defaultDuration.nanoseconds !== 0 ||
+    defaultDuration.minutes !== 0 ||
+    defaultDuration.hours !== 0 ||
+    defaultDuration.days !== 0 ||
+    defaultDuration.weeks !== 0 ||
+    defaultDuration.months !== 0 ||
+    defaultDuration.years !== 0
+  ) {
+    console.error(
+      "DurationDraggo default duration may not contain units other than seconds!",
+      defaultDuration
+    );
+    throw new Error(
+      "DurationDraggo default duration may not contain units other than seconds!"
+    );
+  }
+
   const ZERO = Temporal.Duration.from({ seconds: 0 });
 
   let carrySeconds = $state(0); // accumulate fractional seconds between drag frames
 
   function isZero(d: Temporal.Duration) {
     return Temporal.Duration.compare(d, ZERO) === 0;
-  }
-
-  function total(unit: "minutes" | "hours" | "days", d: Temporal.Duration) {
-    return d.total({ unit });
   }
 
   function roundedDisplay(d: Temporal.Duration): { text: string } {

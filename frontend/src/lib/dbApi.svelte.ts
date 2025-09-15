@@ -247,11 +247,11 @@ export const db = await (async () => {
         avenues: Object.fromEntries([
           ...Object.entries(config.baseAvenues).map(([id, info]) => [
             id,
-            { info, sessions: {}, done: false },
+            { info, sessions: {}, done: false, base: true },
           ]),
           ...Object.entries(modeConfig.avenues).map(([id, info]) => [
             id,
-            { info, sessions: {}, done: false },
+            { info, sessions: {}, done: false, base: false },
           ]),
         ]),
         bypasses: {},
