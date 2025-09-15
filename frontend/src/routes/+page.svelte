@@ -53,12 +53,8 @@
     db.sessionStart(avenue, start, end);
   }
 
-  function onBypassStart(
-    start: Temporal.Instant,
-    end: Temporal.Instant,
-    mode: "normal" | "detox"
-  ) {
-    db.bypassStart(start, end, mode);
+  function onBypassStart(start: Temporal.Instant, end: Temporal.Instant) {
+    db.bypassStart(start, end);
   }
 
   function onDayEndUndo() {
@@ -106,7 +102,7 @@
   const bypassSessions = $derived(
     Object.values(today.bypasses).map((bypass) => ({
       ...bypass,
-      title: encrypt("Bypass" + (bypass.mode === "normal" ? "" : " (Detox)")),
+      title: encrypt("Bypass"),
     }))
   );
   const allSessions = $derived([...avenueSessions, ...bypassSessions]);

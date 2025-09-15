@@ -15,8 +15,7 @@
   ) => {};
   const onBypassStart = (
     _start: Temporal.Instant,
-    _end: Temporal.Instant,
-    _mode: "normal" | "detox"
+    _end: Temporal.Instant
   ) => {};
 </script>
 

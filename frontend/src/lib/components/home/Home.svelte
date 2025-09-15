@@ -8,7 +8,6 @@
     areAvenuesAvailable,
     avenueTimeLeft,
     bypassFrictionPerMinute,
-    detoxRestrictionsApply,
     isInStepAway,
     nextDayReady,
   } from "./homeUtil";
@@ -42,11 +41,7 @@
       end: Temporal.Instant,
       pinned: boolean
     ) => void;
-    onBypassStart: (
-      start: Temporal.Instant,
-      end: Temporal.Instant,
-      mode: "normal" | "detox"
-    ) => void;
+    onBypassStart: (start: Temporal.Instant, end: Temporal.Instant) => void;
     onDayEndUndo: () => void;
     onDayEnd: () => void;
     onAvenueDone: (avenue: string) => void;
@@ -156,11 +151,7 @@
     };
 
   const bypassStarter = (duration: Temporal.Duration) => () => {
-    onBypassStart(
-      now(),
-      now().add(duration),
-      detoxRestrictionsApply(dayState) ? "detox" : "normal"
-    );
+    onBypassStart(now(), now().add(duration));
   };
 </script>
 
@@ -301,14 +292,12 @@
                   dayState,
                   bypasses
                 )}
-                {#if !detoxRestrictionsApply(dayState)}
-                  <FrictionButton
-                    friction={45 * frictionPerMinute}
-                    onactivate={bypassStarter(
-                      Temporal.Duration.from({ minutes: 45 })
-                    )}>&nbsp;45m&nbsp;</FrictionButton
-                  >
-                {/if}
+                <FrictionButton
+                  friction={45 * frictionPerMinute}
+                  onactivate={bypassStarter(
+                    Temporal.Duration.from({ minutes: 45 })
+                  )}>&nbsp;45m&nbsp;</FrictionButton
+                >
                 <FrictionButton
                   friction={15 * frictionPerMinute}
                   onactivate={bypassStarter(

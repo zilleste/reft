@@ -198,11 +198,7 @@ export const db = await (async () => {
         [`avenues.${avenue}.sessions.${id}`]: bs,
       });
     },
-    bypassStart: async (
-      start: Temporal.Instant,
-      end: Temporal.Instant,
-      mode: "normal" | "detox"
-    ) => {
+    bypassStart: async (start: Temporal.Instant, end: Temporal.Instant) => {
       const dayRef = await getDayRef(await userId);
       const id = crypto.randomUUID();
       const bs: BypassSession = {
@@ -234,52 +230,33 @@ export const db = await (async () => {
         [`avenues.${avenue}.done`]: true,
       });
     },
-    startDay: async (
-      mode: { type: "custom"; mode: string } | { type: "detox" }
-    ) => {
+    startDay: async (mode: string) => {
       const id = crypto.randomUUID();
       const uid = await userId;
       const config = await permanentState();
 
-      if (mode.type === "custom") {
-        const modeConfig = config.customModes[mode.mode];
-        if (modeConfig == null) {
-          throw new Error(`Custom mode ${mode.mode} not found`);
-        }
-        await setDoc(doc(firestore, "users", uid, "days", id), {
-          start: Temporal.Now.instant().epochMilliseconds,
-          end: null,
-          modeTitle: modeConfig.title,
-          modeDescription: modeConfig.description,
-          stepAway: {},
-          avenues: Object.fromEntries([
-            ...Object.entries(config.baseAvenues).map(([id, info]) => [
-              id,
-              { info, sessions: {}, done: false },
-            ]),
-            ...Object.entries(modeConfig.avenues).map(([id, info]) => [
-              id,
-              { info, sessions: {}, done: false },
-            ]),
-          ]),
-          bypasses: {},
-        } satisfies DayState);
-      } else {
-        await setDoc(doc(firestore, "users", uid, "days", id), {
-          start: Temporal.Now.instant().epochMilliseconds,
-          end: null,
-          modeTitle: encrypt("Detox"),
-          modeDescription: encrypt("Log off and relax."),
-          stepAway: {},
-          avenues: Object.fromEntries(
-            Object.entries(config.baseAvenues).map(([id, info]) => [
-              id,
-              { info, sessions: {}, done: false },
-            ])
-          ),
-          bypasses: {},
-        } satisfies DayState);
+      const modeConfig = config.customModes[mode];
+      if (modeConfig == null) {
+        throw new Error(`Custom mode ${mode} not found`);
       }
+      await setDoc(doc(firestore, "users", uid, "days", id), {
+        start: Temporal.Now.instant().epochMilliseconds,
+        end: null,
+        modeTitle: modeConfig.title,
+        modeDescription: modeConfig.description,
+        stepAway: {},
+        avenues: Object.fromEntries([
+          ...Object.entries(config.baseAvenues).map(([id, info]) => [
+            id,
+            { info, sessions: {}, done: false },
+          ]),
+          ...Object.entries(modeConfig.avenues).map(([id, info]) => [
+            id,
+            { info, sessions: {}, done: false },
+          ]),
+        ]),
+        bypasses: {},
+      } satisfies DayState);
     },
     endCurrentSession: async () => {
       const dayRef = await getDayRef(await userId);

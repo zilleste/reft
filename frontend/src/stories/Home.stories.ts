@@ -48,7 +48,7 @@ const baseDay = (overrides: Partial<DayState> = {}): DayState => ({
   ...overrides,
 });
 
-const pastBypasses = (mode: "normal" | "detox") => ({
+const pastBypasses = () => ({
   b1: { start: minutesAgo(200), end: minutesAgo(180), deviceId: "dev", mode },
   b2: { start: minutesAgo(100), end: minutesAgo(80), deviceId: "dev", mode },
 });
@@ -76,15 +76,6 @@ export const NormalSession: Story = {
   args: {
     dayState: baseDay({
       bypasses: pastBypasses("normal"),
-    }),
-  },
-};
-
-export const DetoxSession: Story = {
-  args: {
-    dayState: baseDay({
-      modeTitle: encrypt("Detox"),
-      bypasses: pastBypasses("detox"),
     }),
   },
 };
