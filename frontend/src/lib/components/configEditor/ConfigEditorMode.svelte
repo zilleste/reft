@@ -382,7 +382,7 @@
   onerror={(e, reset) => (console.error(e), setTimeout(reset, 1000))}
 >
   <div class="h-full grow p-4 flex flex-col justify-stretch items-stretch">
-    {#if selectedItemExists}
+    {#if (selectedItemExists && selectedItem?.type === "custom_avenue") || selectedItem?.type === "base_avenue"}
       {@const avenue =
         selectedItem.type === "custom_avenue"
           ? customMode!.avenues[selectedItem.avenue]
