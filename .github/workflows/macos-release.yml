@@ -1,0 +1,105 @@
+name: macOS unsigned build and release
+
+on:
+  push:
+    tags:
+      - "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*"
+
+jobs:
+  build-release-macos:
+    runs-on: macos-latest
+
+    env:
+      # Firebase secrets (must be configured in repo/environment secrets)
+      FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+      FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+      FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+      FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Verify tag is contained in main
+        run: |
+          git fetch origin main --depth=1
+          if ! git branch --remotes --contains "$GITHUB_SHA" | grep -q "origin/main"; then
+            echo "Tag commit is not contained in main. Bailing." >&2
+            exit 1
+          fi
+
+      - name: Derive changelog path from tag
+        id: changelog
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          YEAR="${TAG%%-*}"
+          REST="${TAG#*-}"
+          CHANGELOG_FILE="changelogs/${YEAR}/${REST}.md"
+          echo "CHANGELOG_FILE=${CHANGELOG_FILE}" >> "$GITHUB_ENV"
+          if [ ! -f "$CHANGELOG_FILE" ]; then
+            echo "Changelog not found at $CHANGELOG_FILE. Bailing." >&2
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend (SvelteKit)
+        run: pnpm --filter=frontend build
+
+      - name: Prepare electron inputs
+        run: |
+          rm -rf electron/inputs
+          mkdir -p electron/inputs
+          cp -R frontend/build electron/inputs/web
+          pnpm electron:prepare
+
+      - name: Build macOS app (unsigned)
+        working-directory: electron
+        run: pnpm electron-builder --mac
+
+      - name: Package app (.zip)
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          APP_PATH=$(find electron/dist -maxdepth 3 -type d -name "Reft.app" | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "Reft.app not found under electron/dist" >&2
+            find electron/dist -maxdepth 3 -type d -name "*.app" || true
+            exit 1
+          fi
+          # derive arch label from parent dir if present (mac, mac-arm64, mac-x64)
+          PARENT_DIR=$(basename "$(dirname "$APP_PATH")")
+          case "$PARENT_DIR" in
+            mac-arm64) ARCH_LABEL="arm64" ;;
+            mac-x64) ARCH_LABEL="x64" ;;
+            *) ARCH_LABEL="universal" ;;
+          esac
+          ZIP_NAME="Reft-${TAG}-macos-${ARCH_LABEL}.zip"
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_NAME"
+          echo "ZIP_PATH=$ZIP_NAME" >> "$GITHUB_ENV"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Reft ${{ github.ref_name }}
+          body_path: ${{ env.CHANGELOG_FILE }}
+          files: |
+            ${{ env.ZIP_PATH }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
