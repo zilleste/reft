@@ -44,7 +44,7 @@
   onerror={(e, reset) => (console.error(e), setTimeout(reset, 1000))}
 >
   <div
-    class="w-full h-full overflow-hidden flex flex-col justify-stretch items-stretch"
+    class="w-full h-full overflow-hidden flex flex-col justify-stretch items-stretch pt-8"
   >
     <div
       class="flex flex-row border-2 border-amber-300 m-4 grow rounded-2xl overflow-hidden"
