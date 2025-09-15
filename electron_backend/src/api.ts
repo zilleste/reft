@@ -68,6 +68,7 @@ export const setup = (mainWindow: () => BrowserWindow) => {
       mainWindow().setFullScreenable(false);
       mainWindow().setResizable(false);
       mainWindow().setMovable(false);
+      mainWindow().show();
 
       mainWindow().setBounds({
         x: -1,
@@ -91,6 +92,7 @@ export const setup = (mainWindow: () => BrowserWindow) => {
       mainWindow().setFullScreenable(true);
       mainWindow().setResizable(true);
       mainWindow().setMovable(true);
+      mainWindow().hide();
 
       mainWindow().setBounds({
         x: width * 0.25,
