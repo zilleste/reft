@@ -152,7 +152,7 @@
               type: "custom_mode",
               mode: [key, config.customModes[key]],
             };
-          }}><i>+ Add custom mode</i></ConfigEditorItem
+          }}><i>+ Add mode</i></ConfigEditorItem
         >
         <div class="flex-grow"></div>
         {#if startDay && selectedItem?.type === "custom_mode"}
