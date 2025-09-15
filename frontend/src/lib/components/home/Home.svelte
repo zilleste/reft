@@ -20,6 +20,7 @@
   import { now } from "$lib/reactiveNow.svelte";
   import type { DurationFormatOptions } from "../../../app";
   import { onMount } from "svelte";
+  import { comparer } from "$lib/ordering";
 
   let {
     dayState,
@@ -69,6 +70,17 @@
               !dayState.avenues[avenue].done &&
               avenueTimeLeft(dayState, avenue).total("seconds") > 30
           )
+          .toSorted((a, b) => {
+            if (dayState.avenues[a].base && !dayState.avenues[b].base) {
+              return -1;
+            }
+            if (!dayState.avenues[a].base && dayState.avenues[b].base) {
+              return 1;
+            }
+            return comparer(
+              (x: (typeof dayState.avenues)[string]) => x.info.position
+            )(dayState.avenues[a], dayState.avenues[b]);
+          })
           .map((avenue) => ({
             type: "avenue" as const,
             avenue,

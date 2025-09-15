@@ -40,6 +40,7 @@ export const DayState = z.object({
   avenues: z.record(
     z.string(),
     z.object({
+      base: z.boolean().default(false),
       info: AvenueInfo,
       sessions: z.record(z.string(), BoundedSession),
       done: z.boolean(),
