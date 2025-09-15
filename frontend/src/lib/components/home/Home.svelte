@@ -230,7 +230,7 @@
         {@const { title, supplementary, isHovered } = itemInfo(item)}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
-          class="self-stretch text-right cursor-pointer select-none h-12 w-full"
+          class="self-stretch text-right select-none h-12 w-full"
           onmouseenter={() => {
             hoveredItem = item;
           }}
@@ -239,7 +239,7 @@
           }}
         >
           {#if isHovered}
-            <div class="flex flex-row gap-2 cursor-none justify-end w-full">
+            <div class="flex flex-row gap-2 justify-end w-full">
               {#if item.type === "avenue"}
                 {@const timeLeft = avenueTimeLeft(dayState, item.avenue)}
                 <FrictionButton
