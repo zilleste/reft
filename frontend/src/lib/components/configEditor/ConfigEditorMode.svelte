@@ -339,15 +339,11 @@
             bind:duration={
               () =>
                 Temporal.Duration.from({
-                  nanoseconds: Math.round(
+                  seconds: Math.round(
                     (isBase
                       ? baseAvenues[avenueItem.avenue]
                       : customMode!.avenues[avenueItem.avenue]
-                    ).budgetMinutes *
-                      60 *
-                      1000 *
-                      1000 *
-                      1000
+                    ).budgetMinutes * 60
                   ),
                 }),
               (v: Temporal.Duration) => {
