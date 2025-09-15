@@ -82,8 +82,10 @@ export const setup = (mainWindow: () => BrowserWindow) => {
       }
 
       focusIval = setInterval(() => {
-        console.log("focusing");
-        mainWindow().show();
+        if (!mainWindow().isFocused() || !mainWindow().isVisible()) {
+          mainWindow().show();
+          mainWindow().focus();
+        }
       }, 500);
     }
 
