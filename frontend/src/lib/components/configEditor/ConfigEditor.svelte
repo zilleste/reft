@@ -8,6 +8,7 @@
   import { ArrowLeft, Trash } from "@lucide/svelte";
   import ConfigEditorMode from "./ConfigEditorMode.svelte";
   import FrictionButton from "../FrictionButton.svelte";
+  import { onMount } from "svelte";
 
   let {
     config = $bindable(),
@@ -38,6 +39,16 @@
   let selectedItem = $state<MenuItem | null>(null);
 
   let hoveredCustomMode = $state<[string, "top" | "bottom"] | null>(null);
+
+  onMount(() => {
+    const escapeHandler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        goBack?.();
+      }
+    };
+    window.addEventListener("keydown", escapeHandler);
+    return () => window.removeEventListener("keydown", escapeHandler);
+  });
 </script>
 
 <svelte:boundary
