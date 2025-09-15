@@ -206,7 +206,6 @@ export const db = await (async () => {
         end: end.epochMilliseconds,
         // TODO: implement deviceId
         deviceId: "",
-        mode,
       };
       await updateDoc(dayRef, {
         [`bypasses.${id}`]: bs,
