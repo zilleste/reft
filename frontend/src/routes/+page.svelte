@@ -42,6 +42,9 @@
   });
 
   function onStepAway(start: Temporal.Instant, end: Temporal.Instant) {
+    if (Temporal.Now.instant().until(end).total("seconds") < 60) {
+      onEndCurrentSession();
+    }
     db.stepAway(start, end);
   }
 
@@ -62,6 +65,7 @@
   }
 
   function onDayEnd() {
+    onEndCurrentSession();
     db.dayEnd();
   }
 
