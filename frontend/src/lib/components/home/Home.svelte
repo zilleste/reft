@@ -153,6 +153,8 @@
   const bypassStarter = (duration: Temporal.Duration) => () => {
     onBypassStart(now(), now().add(duration));
   };
+
+  const modeTitle = $derived(decrypt(dayState.modeTitle));
 </script>
 
 <div class="w-full h-full p-4">
@@ -169,12 +171,19 @@
       class="place-self-stretch justify-self-stretch mb-[-0.77em] relative grow group select-none"
     >
       <div class="flex flex-row items-end h-full w-full">
-        <span class="text-8xl font-black font-display group-hover:invisible"
+        <span
+          class="{modeTitle.length > 12
+            ? modeTitle.length > 19
+              ? modeTitle.length > 33
+                ? 'text-3xl'
+                : 'text-4xl'
+              : 'text-6xl'
+            : 'text-8xl'} font-black font-display group-hover:invisible"
           >{hoveredItem?.type === "avenue"
             ? decrypt(dayState.avenues[hoveredItem.avenue].info.title)
             : dayState.end
               ? "The End"
-              : decrypt(dayState.modeTitle)}</span
+              : modeTitle}</span
         >
       </div>
 
