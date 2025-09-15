@@ -1,0 +1,8 @@
+packages:
+  - frontend
+  - electron_backend
+  - electron_preload
+  - electron
+
+onlyBuiltDependencies:
+  - esbuild

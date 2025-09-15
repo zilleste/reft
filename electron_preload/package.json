@@ -1,0 +1,8 @@
+{
+  "name": "@opal/electron-preload",
+  "main": "./src/main.ts",
+  "dependencies": {
+    "electron": "^34.3.3"
+  },
+  "private": true
+}

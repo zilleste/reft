@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+
+The app has a continuous black background and follows a retro terminal aesthetic. All components are optimized for this.
+
+All fonts are from the Monaspace family. The default font is Monaspace Xenon.
+
+The primary color is amber-300.
+
+Styling is done with Tailwind CSS.
+
+Each component should have a Storybook story.

@@ -1,0 +1,22 @@
+{
+  "devDependencies": {
+    "@hyrious/esbuild-plugin-commonjs": "^0.2.6",
+    "electron": "^37.2.6",
+    "esbuild": "^0.25.8",
+    "tsx": "^4.19.0",
+    "zx": "^8.1.4"
+  },
+  "scripts": {
+    "android:dev": "scripts/android_dev.mts",
+    "android:install": "scripts/android_install.mts",
+    "electron:prepare": "node --experimental-strip-types scripts/electron_prepare.mts",
+    "electron:dev": "scripts/electron_dev.mts",
+    "electron:install": "scripts/electron_install.mts"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@tailwindcss/oxide",
+      "esbuild"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@opal/electron-backend",
+  "main": "./src/main.ts",
+  "dependencies": {
+    "electron-serve": "^2.1.1",
+    "execa": "^9.6.0"
+  },
+  "devDependencies": {
+    "electron": "^35.0.2"
+  },
+  "type": "module",
+  "private": true
+}

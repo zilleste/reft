@@ -1,0 +1,14 @@
+{
+  "name": "@zill/opal",
+  "devDependencies": {
+    "electron": "^35.0.2",
+    "electron-builder": "^25.1.8"
+  },
+  "private": true,
+  "scripts": {
+    "postinstall": "cd node_modules/electron && node install.js"
+  },
+  "type": "module",
+  "version": "0.0.1",
+  "main": "main.mjs"
+}

@@ -1,0 +1,4 @@
+inputs/
+electron_backend/
+build/
+dist/

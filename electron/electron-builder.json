@@ -1,0 +1,26 @@
+{
+  "appId": "com.albegger.opalmini",
+  "productName": "Reft",
+  "directories": {
+    "output": "dist"
+  },
+  "files": [
+    {
+      "from": "inputs",
+      "to": ".",
+      "filter": ["**/*"]
+    },
+    "nonexistentpatterntoforcewhitelist",
+    "package.json",
+    "!**/node_modules/**"
+  ],
+  "mac": {
+    "category": "public.app-category.productivity",
+    "target": "dir",
+    "identity": null,
+    "extendInfo": {
+      "LSUIElement": true
+    }
+  },
+  "npmRebuild": false
+}
