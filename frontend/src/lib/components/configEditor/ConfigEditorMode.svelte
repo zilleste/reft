@@ -329,7 +329,7 @@
                 (isBase
                   ? baseAvenues[avenueItem.avenue]
                   : customMode!.avenues[avenueItem.avenue]
-                ).title = encrypt(v);
+                ).title = encrypt(v.substring(0, 19));
               }
             }
             placeholder="Unnamed avenue"

@@ -128,7 +128,10 @@
               <Edito
                 bind:value={
                   () => decrypt(mode.title),
-                  (v) => (config.customModes[key].title = encrypt(v))
+                  (v) =>
+                    (config.customModes[key].title = encrypt(
+                      v.substring(0, 19)
+                    ))
                 }
                 editable={isSelected}
                 placeholder="Unnamed mode"
