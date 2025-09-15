@@ -202,13 +202,11 @@
     >
       <div class="flex flex-row items-end h-full w-full">
         <span
-          class="{currentTitle.length > 12
-            ? currentTitle.length > 19
-              ? currentTitle.length > 33
-                ? 'text-3xl'
-                : 'text-4xl'
-              : 'text-6xl'
-            : 'text-8xl'} font-black font-display group-hover:invisible"
+          class="{currentTitle.length > 19
+            ? currentTitle.length > 33
+              ? 'text-3xl'
+              : 'text-4xl'
+            : 'text-6xl'} font-black font-display group-hover:invisible"
           >{currentTitle}</span
         >
       </div>
