@@ -351,7 +351,7 @@
           ),
           null
         )}
-        {#if now().until(startNextDayAt).total("minutes") < 0}
+        {#if now().until(startNextDayAt).total("minutes") <= 0}
           Your next day awaits!
         {:else if now().until(startNextDayAt).total("minutes") < 60}
           Goodbye! You can start the next day in {now()
