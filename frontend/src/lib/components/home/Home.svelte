@@ -168,7 +168,13 @@
     onBypassStart(now(), now().add(duration));
   };
 
-  const modeTitle = $derived(decrypt(dayState.modeTitle));
+  const currentTitle = $derived(
+    hoveredItem?.type === "avenue"
+      ? decrypt(dayState.avenues[hoveredItem.avenue].info.title)
+      : dayState.end
+        ? "The End"
+        : decrypt(dayState.modeTitle)
+  );
 
   onMount(() => {
     const blur = () => {
@@ -196,18 +202,12 @@
     >
       <div class="flex flex-row items-end h-full w-full">
         <span
-          class="{modeTitle.length > 12
-            ? modeTitle.length > 19
-              ? modeTitle.length > 33
-                ? 'text-3xl'
-                : 'text-4xl'
-              : 'text-6xl'
-            : 'text-8xl'} font-black font-display group-hover:invisible"
-          >{hoveredItem?.type === "avenue"
-            ? decrypt(dayState.avenues[hoveredItem.avenue].info.title)
-            : dayState.end
-              ? "The End"
-              : modeTitle}</span
+          class="{currentTitle.length > 19
+            ? currentTitle.length > 33
+              ? 'text-3xl'
+              : 'text-4xl'
+            : 'text-6xl'} font-black font-display group-hover:invisible"
+          >{currentTitle}</span
         >
       </div>
 
