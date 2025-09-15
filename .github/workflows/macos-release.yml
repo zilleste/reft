@@ -102,10 +102,19 @@ jobs:
           ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_NAME"
           echo "ZIP_PATH=$ZIP_NAME" >> "$GITHUB_ENV"
 
+      - name: Prepare a unique name for Artifacts
+        id: prep_artifact_name
+        run: |
+          # https://github.com/actions/upload-artifact/issues/22#issuecomment-873445944
+          name="reft-${{ github.ref_name }}-${{ github.run_id }}"
+          # The option to enable + in sed regexps differs by OS so we avoid it
+          name=$(echo -n "$name" | sed -e 's/[ \t:\/\\"<>|*?]/-/g' -e 's/--*/-/g')
+          echo "ARTIFACT_NAME=$name" >> $GITHUB_ENV
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: reft-${{ github.ref_name }}-${{ github.run_id }}
+          name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.ZIP_PATH }}
           if-no-files-found: error
 
