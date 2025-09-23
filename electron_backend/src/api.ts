@@ -77,12 +77,22 @@ export const setup = (
       mainWindow().setAlwaysOnTop(true, "screen-saver", 100);
       mainWindow().setVisibleOnAllWorkspaces(true, {
         visibleOnFullScreen: true,
-        skipTransformProcessType: true,
       });
       mainWindow().setFullScreenable(false);
       mainWindow().setResizable(false);
       mainWindow().setMovable(false);
       mainWindow().show();
+      // ensure we're treated as an accessory app and hidden from the Dock
+      app.dock?.hide();
+      app.setActivationPolicy("accessory");
+      // after showing, force activation so the window becomes visible on boot
+      setImmediate(() => {
+        try {
+          // steal focus if we're launched at login and not activated yet (macOS)
+          // @ts-ignore Electron types allow an options object on macOS
+          app.focus?.({ steal: true });
+        } catch {}
+      });
 
       mainWindow().setBounds({
         x: -1,
