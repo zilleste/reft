@@ -116,6 +116,7 @@
     const currentTimeLeft = currentSessionTimeLeft(allSessions);
 
     if (current && currentTimeLeft) {
+      console.log("setting mode to UNLOCKED");
       desktop.setMode("unlocked");
       desktop.setTrayTitle(
         `${decrypt(current.title)} ${currentTimeLeft
@@ -127,6 +128,7 @@
           })}`
       );
     } else {
+      console.log("setting mode to LOCKED");
       desktop.setMode("locked");
     }
   });

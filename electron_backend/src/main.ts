@@ -67,6 +67,8 @@ function createWindow() {
     mainWindow.loadURL("app://-");
   }
 
+  mainWindow.show();
+
   setupWindow();
 }
 
