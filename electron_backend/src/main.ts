@@ -18,9 +18,13 @@ app.setPath(
 
 let mainWindow = null as BrowserWindow | null;
 
-const getMainWindow = () => {
-  if (!mainWindow) {
+const getMainWindow = <T = BrowserWindow>(
+  notFound: () => T = () => {
     throw new Error("Main window not found");
+  }
+): BrowserWindow | T => {
+  if (!mainWindow) {
+    return notFound();
   }
   return mainWindow;
 };

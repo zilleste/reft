@@ -13,7 +13,11 @@ import { execa } from "execa";
 
 app.setActivationPolicy("accessory");
 
-export const setup = (mainWindow: () => BrowserWindow) => {
+export const setup = (
+  mainWindow: <T = BrowserWindow>(
+    notFound?: () => BrowserWindow | T
+  ) => BrowserWindow | T
+) => {
   let mode = "unset" as "locked" | "unlocked" | "unset";
   let tray: Tray | null = null;
 
@@ -51,9 +55,19 @@ export const setup = (mainWindow: () => BrowserWindow) => {
     return tray;
   };
 
-  const setMode = (newMode: "locked" | "unlocked") => {
+  let setModeCalls = 0;
+
+  const setMode = async (newMode: "locked" | "unlocked") => {
     if (mode === newMode) {
       return;
+    }
+
+    const currentSetModeCall = ++setModeCalls;
+    while (mainWindow(() => null) == null) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      if (currentSetModeCall !== setModeCalls) {
+        return;
+      }
     }
 
     const primaryDisplay = screen.getPrimaryDisplay();
@@ -111,6 +125,12 @@ export const setup = (mainWindow: () => BrowserWindow) => {
 
     mode = newMode;
   };
+
+  app.on("ready", () => {
+    if (mode === "unset") {
+      setMode("locked");
+    }
+  });
 
   ipcMain.handle("set-mode", async (_, newMode: "locked" | "unlocked") => {
     setMode(newMode);
