@@ -7,6 +7,8 @@ const electronAPI = (globalThis as any).electronAPI as
       setTrayTitle: (title: string) => Promise<boolean>;
       onDeviceLock: (callback: () => void) => () => void;
       onTrayClick: (callback: () => void) => () => void;
+      getNotepadContent: () => Promise<string>;
+      setNotepadContent: (content: string) => Promise<void>;
     }
   | undefined;
 
@@ -52,5 +54,17 @@ export const desktop = {
       return () => {};
     }
     return electronAPI.onTrayClick(callback);
+  },
+  getNotepadContent: () => {
+    if (!electronAPI) {
+      return Promise.resolve("");
+    }
+    return electronAPI.getNotepadContent();
+  },
+  setNotepadContent: (content: string) => {
+    if (!electronAPI) {
+      return Promise.resolve();
+    }
+    return electronAPI.setNotepadContent(content);
   },
 };

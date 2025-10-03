@@ -11,13 +11,14 @@
   } from "$lib/sessioncalc.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
   import { Temporal } from "temporal-polyfill";
+  import Notepad from "$lib/components/Notepad.svelte";
 
-  let isInConfig = $state(false);
+  let currentPage: "home" | "config" | "notepad" = $state("home");
   let configSaverInterval: ReturnType<typeof setInterval> | null = $state(null);
 
   function toggleConfig() {
-    if (isInConfig) {
-      isInConfig = false;
+    if (currentPage === "config") {
+      currentPage = "home";
       db.setPermanentState(config);
       if (configSaverInterval !== null) {
         clearInterval(configSaverInterval);
@@ -25,7 +26,7 @@
     } else {
       permanentState().then((state) => {
         config = state;
-        isInConfig = true;
+        currentPage = "config";
         if (configSaverInterval === null) {
           configSaverInterval = setInterval(() => {
             db.setPermanentState(config);
@@ -78,6 +79,10 @@
     if (current) {
       db.endCurrentSession();
     }
+  }
+
+  function onNotepad() {
+    currentPage = "notepad";
   }
 
   function onShutdown() {
@@ -150,7 +155,7 @@
 </script>
 
 <div class="text-amber-300 w-screen h-screen">
-  {#if !isInConfig}
+  {#if currentPage === "home"}
     <Home
       dayState={today}
       onConfig={toggleConfig}
@@ -161,9 +166,10 @@
       {onDayEnd}
       {onAvenueDone}
       {onEndCurrentSession}
+      {onNotepad}
       {onShutdown}
     />
-  {:else}
+  {:else if currentPage === "config"}
     <ConfigEditor
       bind:config
       goBack={toggleConfig}
@@ -173,5 +179,21 @@
           }
         : undefined}
     />
+  {:else if currentPage === "notepad"}
+    <svelte:boundary>
+      {#snippet pending()}
+        <p>loading...</p>
+      {/snippet}
+
+      <Notepad
+        save={(content) => {
+          desktop.setNotepadContent(content);
+        }}
+        goBack={() => {
+          currentPage = "home";
+        }}
+        contentPromise={desktop.getNotepadContent()}
+      />
+    </svelte:boundary>
   {/if}
 </div>

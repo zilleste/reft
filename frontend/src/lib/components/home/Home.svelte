@@ -32,6 +32,7 @@
     onBypassStart,
     onAvenueDone,
     onEndCurrentSession,
+    onNotepad,
     onShutdown,
   }: {
     dayState: DayState;
@@ -48,6 +49,7 @@
     onDayEnd: () => void;
     onAvenueDone: (avenue: string) => void;
     onEndCurrentSession: () => void;
+    onNotepad: () => void;
     onShutdown: () => void;
   } = $props();
 
@@ -237,6 +239,14 @@
             {:else}
               Edit config
             {/if}
+          </FrictionButton>
+          <FrictionButton
+            friction={500}
+            onactivate={() => {
+              onNotepad();
+            }}
+          >
+            Notepad
           </FrictionButton>
           <FrictionButton
             friction={2000}
