@@ -129,17 +129,18 @@ function createWindow() {
     app.focus?.({ steal: true });
     try {
       const lis = (app as any).getLoginItemSettings?.();
-      if (
-        lis?.wasOpenedAtLogin ||
-        lis?.wasOpenedAsHidden ||
-        lis?.restoreState
-      ) {
+      const shouldFlip =
+        process.env.REFT_POLICY_FLIP === "1" &&
+        (lis?.wasOpenedAtLogin || lis?.wasOpenedAsHidden || lis?.restoreState);
+      if (shouldFlip) {
         log("login-launch:regularize-then-accessory");
         app.setActivationPolicy?.("regular");
         setTimeout(() => {
           app.setActivationPolicy?.("accessory");
           app.dock?.hide();
         }, 500);
+      } else {
+        log("login-launch:no-flip");
       }
     } catch {}
   } catch {}
