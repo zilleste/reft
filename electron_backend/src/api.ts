@@ -11,6 +11,8 @@ import {
 } from "electron";
 import { execa } from "execa";
 import { log } from "./logger.js";
+import * as path from "path";
+import * as fs from "fs";
 
 export const setup = (
   mainWindow: <T = BrowserWindow>(
@@ -200,6 +202,30 @@ export const setup = (
       return true;
     }
     return false;
+  });
+
+  const appDataPath = app.getPath("userData");
+  const notepadPath = path.join(appDataPath, "reftpad.txt");
+
+  const getNotepadContent = async () => {
+    if (fs.existsSync(notepadPath)) {
+      return fs.readFileSync(notepadPath, "utf8");
+    } else {
+      return "Welcome to your notepad!";
+    }
+  };
+
+  ipcMain.handle("get-notepad-content", async () => {
+    try {
+      return await getNotepadContent();
+    } catch (e) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return await getNotepadContent();
+    }
+  });
+
+  ipcMain.handle("set-notepad-content", async (_, content: string) => {
+    fs.writeFileSync(notepadPath, content);
   });
 
   return () => {

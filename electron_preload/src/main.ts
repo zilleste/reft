@@ -29,4 +29,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
       ipcRenderer.removeListener("tray-click", trayClickHandler);
     };
   },
+  getNotepadContent: () => ipcRenderer.invoke("get-notepad-content"),
+  setNotepadContent: (content: string) =>
+    ipcRenderer.invoke("set-notepad-content", content),
 });
