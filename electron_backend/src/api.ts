@@ -10,10 +10,13 @@ import {
   nativeImage,
 } from "electron";
 import { execa } from "execa";
+import { log } from "./logger.js";
 
-app.setActivationPolicy("accessory");
-
-export const setup = (mainWindow: () => BrowserWindow) => {
+export const setup = (
+  mainWindow: <T = BrowserWindow>(
+    notFound?: () => BrowserWindow | T
+  ) => BrowserWindow | T
+) => {
   let mode = "unset" as "locked" | "unlocked" | "unset";
   let tray: Tray | null = null;
 
@@ -21,23 +24,28 @@ export const setup = (mainWindow: () => BrowserWindow) => {
 
   // Set up power monitor events to trigger device lock
   powerMonitor.on("suspend", () => {
+    log("power:suspend");
     mainWindow().webContents.send("device-lock");
   });
 
   powerMonitor.on("shutdown", () => {
+    log("power:shutdown");
     mainWindow().webContents.send("device-lock");
   });
 
   powerMonitor.on("lock-screen", () => {
+    log("power:lock-screen");
     mainWindow().webContents.send("device-lock");
   });
 
   powerMonitor.on("user-did-resign-active", () => {
+    log("power:user-did-resign-active");
     mainWindow().webContents.send("device-lock");
   });
 
   // Initialize tray
   const createTray = () => {
+    log("tray:create");
     tray = new Tray(nativeImage.createEmpty());
     tray.setTitle("Reft", {
       fontType: "monospacedDigit",
@@ -51,24 +59,49 @@ export const setup = (mainWindow: () => BrowserWindow) => {
     return tray;
   };
 
-  const setMode = (newMode: "locked" | "unlocked") => {
+  let setModeCalls = 0;
+
+  const setMode = async (newMode: "locked" | "unlocked") => {
+    log("setMode:enter", { from: mode, to: newMode });
     if (mode === newMode) {
+      log("setMode:noop");
       return;
+    }
+
+    const currentSetModeCall = ++setModeCalls;
+    while (mainWindow(() => null) == null) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      if (currentSetModeCall !== setModeCalls) {
+        log("setMode:stale");
+        return;
+      }
     }
 
     const primaryDisplay = screen.getPrimaryDisplay();
     const { width, height } = primaryDisplay.bounds;
 
     if (newMode === "locked") {
+      log("mode:locked:configure");
       mainWindow().setAlwaysOnTop(true, "screen-saver", 100);
       mainWindow().setVisibleOnAllWorkspaces(true, {
         visibleOnFullScreen: true,
-        skipTransformProcessType: true,
       });
       mainWindow().setFullScreenable(false);
       mainWindow().setResizable(false);
       mainWindow().setMovable(false);
       mainWindow().show();
+      log("mode:locked:show");
+      // ensure we're treated as an accessory app and hidden from the Dock
+      app.dock?.hide();
+      app.setActivationPolicy("accessory");
+      // after showing, force activation so the window becomes visible on boot
+      setImmediate(() => {
+        try {
+          // steal focus if we're launched at login and not activated yet (macOS)
+          // @ts-ignore Electron types allow an options object on macOS
+          app.focus?.({ steal: true });
+        } catch {}
+      });
 
       mainWindow().setBounds({
         x: -1,
@@ -82,7 +115,10 @@ export const setup = (mainWindow: () => BrowserWindow) => {
       }
 
       focusIval = setInterval(() => {
-        if (!mainWindow().isFocused() || !mainWindow().isVisible()) {
+        const focused = mainWindow().isFocused();
+        const visible = mainWindow().isVisible();
+        if (!focused || !visible) {
+          log("mode:locked:ensure-focus", { focused, visible });
           mainWindow().show();
           mainWindow().focus();
         }
@@ -90,12 +126,14 @@ export const setup = (mainWindow: () => BrowserWindow) => {
     }
 
     if (newMode === "unlocked") {
+      log("mode:unlocked:configure");
       mainWindow().setAlwaysOnTop(false);
       mainWindow().setVisibleOnAllWorkspaces(false);
       mainWindow().setFullScreenable(true);
       mainWindow().setResizable(true);
       mainWindow().setMovable(true);
       mainWindow().hide();
+      log("mode:unlocked:hide");
 
       mainWindow().setBounds({
         x: width * 0.25,
@@ -112,17 +150,27 @@ export const setup = (mainWindow: () => BrowserWindow) => {
     mode = newMode;
   };
 
+  app.on("ready", () => {
+    log("app:ready:api");
+    if (mode === "unset") {
+      setMode("locked");
+    }
+  });
+
   ipcMain.handle("set-mode", async (_, newMode: "locked" | "unlocked") => {
+    log("ipc:set-mode", newMode);
     setMode(newMode);
     return true;
   });
 
   ipcMain.handle("quit", async () => {
+    log("ipc:quit");
     app.exit();
     return true;
   });
 
   ipcMain.handle("shutdown", async () => {
+    log("ipc:shutdown");
     try {
       // user added this command as a nopasswd command
       execa("sudo", ["/sbin/shutdown", "-h", "+1"], {
@@ -137,7 +185,7 @@ export const setup = (mainWindow: () => BrowserWindow) => {
 
       app.exit();
     } catch (e) {
-      console.error("Shutdown sequence error:", e);
+      log("shutdown:error", e);
     }
     return true;
   });
@@ -148,12 +196,14 @@ export const setup = (mainWindow: () => BrowserWindow) => {
       tray.setTitle(title, {
         fontType: "monospacedDigit",
       });
+      log("tray:title", title);
       return true;
     }
     return false;
   });
 
   return () => {
+    log("api:init-return:createTray");
     createTray();
   };
 };
