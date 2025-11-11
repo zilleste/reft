@@ -28,8 +28,13 @@ import { getAuth } from "firebase/auth";
 import type { DeepImmutable } from "./typeutil";
 import { get } from "svelte/store";
 import { Temporal } from "temporal-polyfill";
-import { allCurrentSessions, currentSession } from "./sessioncalc.svelte";
+import {
+  allCurrentSessions,
+  currentSession,
+  emaTime,
+} from "./sessioncalc.svelte";
 import { now } from "./reactiveNow.svelte";
+import { EMA_SPEC_BYPASS } from "./ema";
 
 const defaultDayState: DayState = {
   start: 0,
@@ -232,6 +237,7 @@ export const db = await (async () => {
     startDay: async (mode: string) => {
       const id = crypto.randomUUID();
       const uid = await userId;
+      const previousDay = await dayState();
       const config = await permanentState();
 
       const modeConfig = config.customModes[mode];
@@ -255,6 +261,13 @@ export const db = await (async () => {
           ]),
         ]),
         bypasses: {},
+        bypassEmaState: emaTime(
+          Object.values(previousDay.bypasses),
+          EMA_SPEC_BYPASS,
+          {
+            state: previousDay.bypassEmaState,
+          }
+        ),
       } satisfies DayState);
     },
     endCurrentSession: async () => {
