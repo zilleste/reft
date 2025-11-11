@@ -245,22 +245,36 @@ export const db = await (async () => {
       if (modeConfig == null) {
         throw new Error(`Custom mode ${mode} not found`);
       }
+
+      const newDayStart = Temporal.Now.instant();
+      const newDayStartMs = newDayStart.epochMilliseconds;
+
+      const activeStepAwayEntries = Object.entries(previousDay.stepAway).filter(
+        ([, session]) => session.end > newDayStartMs
+      );
+      const stepAwaySessions = activeStepAwayEntries.reduce<
+        Record<string, BoundedSession>
+      >((acc, [sessionId, session]) => {
+        acc[sessionId] = session;
+        return acc;
+      }, {});
+
+      if (previousDay.end != null) {
+        const defaultStepAway: BoundedSession = {
+          start: previousDay.end,
+          end: previousDay.end + 60 * 60 * 1000,
+          // TODO: implement deviceId
+          deviceId: "",
+        };
+        stepAwaySessions[crypto.randomUUID()] = defaultStepAway;
+      }
+
       await setDoc(doc(firestore, "users", uid, "days", id), {
-        start: Temporal.Now.instant().epochMilliseconds,
+        start: newDayStartMs,
         end: null,
         modeTitle: modeConfig.title,
         modeDescription: modeConfig.description,
-        stepAway:
-          previousDay.end != null
-            ? {
-                [crypto.randomUUID()]: {
-                  start: previousDay.end,
-                  end: previousDay.end + 60 * 60 * 1000,
-                  // TODO: implement deviceId
-                  deviceId: "",
-                },
-              }
-            : {},
+        stepAway: stepAwaySessions,
         avenues: Object.fromEntries([
           ...Object.entries(config.baseAvenues).map(([id, info]) => [
             id,
