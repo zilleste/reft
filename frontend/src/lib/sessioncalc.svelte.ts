@@ -1,6 +1,7 @@
 import { Temporal } from "temporal-polyfill";
-import type { BoundedSession } from "./dbTypes";
+import type { BoundedSession, BypassSession } from "./dbTypes";
 import { now as reactiveNow } from "./reactiveNow.svelte";
+import type { EmaSpec, EmaState } from "./ema";
 
 /**
  * Calculates the total session time up to now. Takes care of duplicate sessions,
@@ -50,6 +51,63 @@ export function totalTime(
   mergedTotalMs += currentEnd - currentStart;
 
   return Temporal.Duration.from({ milliseconds: mergedTotalMs });
+}
+
+type EmaTimeOptions = {
+  now?: Temporal.Instant;
+  state?: EmaState;
+};
+
+/**
+ * Computes an exponential moving average over bypass durations.
+ * Each bypass contributes its entire duration as a Dirac delta at the bypass end.
+ */
+export function emaTime(
+  bypasses: BypassSession[],
+  spec: EmaSpec,
+  { now = reactiveNow(), state }: EmaTimeOptions = {}
+): EmaState {
+  const nowMs = now.epochMilliseconds;
+  const baselineMs = state?.at.epochMilliseconds ?? Number.NEGATIVE_INFINITY;
+
+  // Treat `at` as milliseconds for decay calculations. Non-positive durations
+  // imply an instantaneous drop for any positive elapsed time.
+  const atMs = Math.max(0, spec.at.total({ unit: "milliseconds" }));
+
+  const decayFactor = (elapsedMs: number): number => {
+    if (elapsedMs <= 0) return 1;
+    if (spec.remaining <= 0) return 0;
+    if (spec.remaining >= 1) return 1;
+    const normalized = atMs > 0 ? elapsedMs / atMs : Number.POSITIVE_INFINITY;
+    return Math.pow(spec.remaining, normalized);
+  };
+
+  let amount = state?.amount ?? 0;
+  let lastTimestamp =
+    state?.at !== undefined ? state.at.epochMilliseconds : undefined;
+
+  const contributions = bypasses
+    .map((session) => {
+      const end = Math.min(session.end, nowMs);
+      const start = Math.min(session.start, end);
+      return { start, end };
+    })
+    .filter(({ start, end }) => end > start && end > baselineMs && end <= nowMs)
+    .sort((a, b) => a.end - b.end);
+
+  for (const { start, end } of contributions) {
+    if (lastTimestamp !== undefined) {
+      amount *= decayFactor(end - lastTimestamp);
+    }
+    amount += end - start;
+    lastTimestamp = end;
+  }
+
+  if (lastTimestamp !== undefined) {
+    amount *= decayFactor(nowMs - lastTimestamp);
+  }
+
+  return { amount, at: now };
 }
 
 /**
