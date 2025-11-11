@@ -173,9 +173,11 @@
     <ConfigEditor
       bind:config
       goBack={toggleConfig}
-      startDay={(mode) => {
-        db.startDay(mode);
-      }}
+      startDay={today.end != null
+        ? (mode) => {
+            db.startDay(mode);
+          }
+        : undefined}
     />
   {:else if currentPage === "notepad"}
     <svelte:boundary>
