@@ -72,7 +72,7 @@
     bind:this={textarea}
     bind:value={content}
     oninput={scheduleSave}
-    onselect={updateSelectionWordCount}
+    onselectionchange={updateSelectionWordCount}
     onkeyup={updateSelectionWordCount}
     onmouseup={updateSelectionWordCount}
     onblur={clearSelectionWordCount}
@@ -80,7 +80,8 @@
 
   {#if selectedWordCount > 0}
     <div class="word-counter">
-      {selectedWordCount} {selectedWordCount === 1 ? "word" : "words"}
+      {selectedWordCount}
+      {selectedWordCount === 1 ? "word" : "words"}
     </div>
   {/if}
 </div>
