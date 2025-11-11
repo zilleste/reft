@@ -35,6 +35,7 @@ import {
 } from "./sessioncalc.svelte";
 import { now } from "./reactiveNow.svelte";
 import { EMA_SPEC_BYPASS } from "./ema";
+import { clamp } from "./mathutil";
 
 const defaultDayState: DayState = {
   start: 0,
@@ -249,7 +250,17 @@ export const db = await (async () => {
         end: null,
         modeTitle: modeConfig.title,
         modeDescription: modeConfig.description,
-        stepAway: {},
+        stepAway:
+          previousDay.end != null
+            ? {
+                [crypto.randomUUID()]: {
+                  start: previousDay.end,
+                  end: previousDay.end + 60 * 60 * 1000,
+                  // TODO: implement deviceId
+                  deviceId: "",
+                },
+              }
+            : {},
         avenues: Object.fromEntries([
           ...Object.entries(config.baseAvenues).map(([id, info]) => [
             id,
