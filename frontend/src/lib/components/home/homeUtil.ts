@@ -1,6 +1,7 @@
 import type { BypassSession, DayState } from "$lib/dbTypes";
+import { EMA_SPEC_BYPASS } from "$lib/ema";
 import { now } from "$lib/reactiveNow.svelte";
-import { currentSession, totalTime } from "$lib/sessioncalc.svelte";
+import { currentSession, emaTime, totalTime } from "$lib/sessioncalc.svelte";
 import { Temporal } from "temporal-polyfill";
 
 export function isInStepAway(day: DayState): boolean {
@@ -11,11 +12,24 @@ export function areAvenuesAvailable(day: DayState): boolean {
   return !day.end && !isInStepAway(day);
 }
 
+export function getBypassTime(
+  day: DayState,
+  bypasses: BypassSession[]
+): Temporal.Duration {
+  return Temporal.Duration.from({
+    milliseconds: Math.ceil(
+      emaTime(bypasses, EMA_SPEC_BYPASS, {
+        state: day.bypassEmaState,
+      }).amount
+    ),
+  });
+}
+
 export function bypassFrictionPerMinute(
   day: DayState,
   bypasses: BypassSession[]
 ): number {
-  const bypassTimeMins = totalTime(bypasses).total("minutes");
+  const bypassTimeMins = getBypassTime(day, bypasses).total("minutes");
   return (
     400 *
     (1 +

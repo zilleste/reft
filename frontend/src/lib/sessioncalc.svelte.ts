@@ -68,11 +68,11 @@ export function emaTime(
   { now = reactiveNow(), state }: EmaTimeOptions = {}
 ): EmaState {
   const nowMs = now.epochMilliseconds;
-  const baselineMs = state?.at.epochMilliseconds ?? Number.NEGATIVE_INFINITY;
+  const baselineMs = state?.at ?? Number.NEGATIVE_INFINITY;
 
   // Treat `at` as milliseconds for decay calculations. Non-positive durations
   // imply an instantaneous drop for any positive elapsed time.
-  const atMs = Math.max(0, spec.at.total({ unit: "milliseconds" }));
+  const atMs = Math.max(0, spec.at);
 
   const decayFactor = (elapsedMs: number): number => {
     if (elapsedMs <= 0) return 1;
@@ -83,8 +83,7 @@ export function emaTime(
   };
 
   let amount = state?.amount ?? 0;
-  let lastTimestamp =
-    state?.at !== undefined ? state.at.epochMilliseconds : undefined;
+  let lastTimestamp = state?.at !== undefined ? state.at : undefined;
 
   const contributions = bypasses
     .map((session) => {
@@ -107,7 +106,7 @@ export function emaTime(
     amount *= decayFactor(nowMs - lastTimestamp);
   }
 
-  return { amount, at: now };
+  return { amount, at: now.epochMilliseconds };
 }
 
 /**

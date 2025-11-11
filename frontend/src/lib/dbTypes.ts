@@ -1,6 +1,7 @@
 import z from "zod";
 import { EncryptedString } from "./crypto.svelte";
 import { OrderKey } from "./ordering";
+import { EmaState } from "./ema";
 
 export const UnboundedSession = z.object({
   start: z.number(),
@@ -47,6 +48,7 @@ export const DayState = z.object({
     })
   ),
   bypasses: z.record(z.string(), BypassSession),
+  bypassEmaState: EmaState.optional(),
 });
 export type DayState = z.infer<typeof DayState>;
 

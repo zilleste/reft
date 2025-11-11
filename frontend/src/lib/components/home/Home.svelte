@@ -2,12 +2,13 @@
   import type { DayState } from "$lib/dbTypes";
   import { Temporal } from "temporal-polyfill";
   import StepAway from "../StepAway.svelte";
-  import { decrypt } from "$lib/crypto.svelte";
+  import { decrypt, EncryptedString } from "$lib/crypto.svelte";
   import FrictionButton from "../FrictionButton.svelte";
   import {
     areAvenuesAvailable,
     avenueTimeLeft,
     bypassFrictionPerMinute,
+    getBypassTime,
     isInStepAway,
     nextDayReady,
   } from "./homeUtil";
@@ -20,7 +21,7 @@
   import { now } from "$lib/reactiveNow.svelte";
   import type { DurationFormatOptions } from "../../../app";
   import { onMount } from "svelte";
-  import { comparer } from "$lib/ordering";
+  import { comparer, OrderKey } from "$lib/ordering";
 
   let {
     dayState,
@@ -131,7 +132,7 @@
       };
     }
     if (item.type === "bypass") {
-      const supplementary = `-${totalTime(bypasses)
+      const supplementary = `-${getBypassTime(dayState, bypasses)
         .round({
           largestUnit: "hours",
           smallestUnit: "minutes",
